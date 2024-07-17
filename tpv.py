@@ -2,6 +2,7 @@ import time
 import requests
 import random
 import json
+from datetime import datetime, timedelta
 
 # Fungsi untuk membaca data dari file data.txt
 def read_data(file_path):
@@ -18,19 +19,30 @@ def tap_tap(auth_header, init_data):
         "Content-Type": "application/json"
     }
 
+    total_touch_count = 0
+    auto_count = 2
+    auto_damage = 2
+
     for _ in range(10):
         touch_count = random.randint(170, 180)
+        total_touch_count += touch_count
         payload = {
             "touchCount": touch_count,
-            "autoCount": 12,
-            "autoDamage": 12
+            "autoCount": auto_count,
+            "autoDamage": auto_damage
         }
         response = requests.post(url, headers=headers, data=json.dumps(payload))
         if response.status_code == 200:
-            print("Tap tap request successful:", response.json())
+            print("Tap tap request successful")
+        elif response.status_code == 202:
+            print("Tap tap request accepted")
         else:
-            print("Tap tap request failed:", response.status_code)
+            print(f"Tap tap request failed with status code: {response.status_code}")
+        auto_count += 1
+        auto_damage += 1
         time.sleep(3)
+    
+    print(f"Total touch count for this account: {total_touch_count}")
 
 # Fungsi untuk melakukan request gatcha
 def gatcha(auth_header, init_data):
@@ -42,9 +54,11 @@ def gatcha(auth_header, init_data):
     }
     response = requests.post(url, headers=headers)
     if response.status_code == 200:
-        print("Gatcha request successful:", response.json())
+        print("Gatcha request successful")
+    elif response.status_code == 201:
+        print("Gatcha request failed: COIN_IS_NOT_ENOUGH")
     else:
-        print("Gatcha request failed:", response.status_code)
+        print(f"Gatcha request failed with status code: {response.status_code}")
 
 # Fungsi untuk menjalankan hitung mundur
 def countdown_timer(seconds):
@@ -65,9 +79,14 @@ def main():
         auth_header = data[i * 2]
         init_data = data[i * 2 + 1]
         print(f"Processing account {i + 1} of {num_accounts}")
-        
+
         # Menjalankan tugas tap tap
         tap_tap(auth_header, init_data)
+
+        # Menampilkan waktu untuk tugas gatcha berikutnya
+        next_gatcha_time = datetime.now() + timedelta(seconds=5600)
+        print(f"Next gatcha task for account {i + 1} will be at {next_gatcha_time.strftime('%Y-%m-%d %H:%M:%S')}")
+
         # Menjalankan tugas gatcha
         gatcha(auth_header, init_data)
         
