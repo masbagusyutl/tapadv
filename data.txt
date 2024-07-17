@@ -1,4 +1,0 @@
-Bearer
-Query
-Bearer
-Query
