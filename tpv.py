@@ -75,6 +75,9 @@ def main():
     num_accounts = len(data) // 2
     print(f"Total accounts: {num_accounts}")
 
+    # Menanyakan pengguna apakah ingin mengaktifkan tugas gatcha
+    gatcha_enabled = input("Do you want to enable the gatcha task? (yes/no): ").strip().lower() == "yes"
+
     for i in range(num_accounts):
         auth_header = data[i * 2]
         init_data = data[i * 2 + 1]
@@ -83,12 +86,13 @@ def main():
         # Menjalankan tugas tap tap
         tap_tap(auth_header, init_data)
 
-        # Menampilkan waktu untuk tugas gatcha berikutnya
-        next_gatcha_time = datetime.now() + timedelta(seconds=5600)
-        print(f"Next gatcha task for account {i + 1} will be at {next_gatcha_time.strftime('%Y-%m-%d %H:%M:%S')}")
+        if gatcha_enabled:
+            # Menampilkan waktu untuk tugas gatcha berikutnya
+            next_gatcha_time = datetime.now() + timedelta(seconds=5600)
+            print(f"Next gatcha task for account {i + 1} will be at {next_gatcha_time.strftime('%Y-%m-%d %H:%M:%S')}")
 
-        # Menjalankan tugas gatcha
-        gatcha(auth_header, init_data)
+            # Menjalankan tugas gatcha
+            gatcha(auth_header, init_data)
         
         # Jeda 5 detik sebelum akun berikutnya
         time.sleep(5)
