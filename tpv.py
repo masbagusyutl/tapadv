@@ -10,12 +10,21 @@ def read_data(file_path):
         data = file.read().splitlines()
     return data
 
+# Fungsi untuk mengambil nama pengguna dari init_data
+def extract_username(init_data):
+    import urllib.parse
+    start = init_data.find("username%22%3A%22") + len("username%22%3A%22")
+    end = init_data.find("%22", start)
+    username = init_data[start:end]
+    return urllib.parse.unquote(username)
+
 # Fungsi untuk melakukan request tap tap
-def tap_tap(auth_header, init_data):
+def tap_tap(auth_header, init_data, user_agent):
     url = "https://tapadventure.pixelheroes.io/api/tapTouch"
     headers = {
         "Authorization": auth_header,
         "Initdata": init_data,
+        "User-Agent": user_agent,
         "Content-Type": "application/json"
     }
 
@@ -45,11 +54,12 @@ def tap_tap(auth_header, init_data):
     print(f"Total touch count for this account: {total_touch_count}")
 
 # Fungsi untuk melakukan request gatcha
-def gatcha(auth_header, init_data):
+def gatcha(auth_header, init_data, user_agent):
     url = "https://tapadventure.pixelheroes.io/api/gatCha"
     headers = {
         "Authorization": auth_header,
         "Initdata": init_data,
+        "User-Agent": user_agent,
         "Content-Type": "application/json"
     }
     response = requests.post(url, headers=headers)
@@ -77,22 +87,24 @@ def main():
 
     # Menanyakan pengguna apakah ingin mengaktifkan tugas gatcha
     gatcha_enabled = input("Do you want to enable the gatcha task? (yes/no): ").strip().lower() == "yes"
+    user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0"
 
     for i in range(num_accounts):
         auth_header = data[i * 2]
         init_data = data[i * 2 + 1]
-        print(f"Processing account {i + 1} of {num_accounts}")
+        username = extract_username(init_data)
+        print(f"Processing account {i + 1} of {num_accounts}: {username}")
 
         # Menjalankan tugas tap tap
-        tap_tap(auth_header, init_data)
+        tap_tap(auth_header, init_data, user_agent)
 
         if gatcha_enabled:
             # Menampilkan waktu untuk tugas gatcha berikutnya
             next_gatcha_time = datetime.now() + timedelta(seconds=5600)
-            print(f"Next gatcha task for account {i + 1} will be at {next_gatcha_time.strftime('%Y-%m-%d %H:%M:%S')}")
+            print(f"Next gatcha task for account {i + 1} ({username}) will be at {next_gatcha_time.strftime('%Y-%m-%d %H:%M:%S')}")
 
             # Menjalankan tugas gatcha
-            gatcha(auth_header, init_data)
+            gatcha(auth_header, init_data, user_agent)
         
         # Jeda 5 detik sebelum akun berikutnya
         time.sleep(5)
