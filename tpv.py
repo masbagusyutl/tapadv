@@ -34,8 +34,15 @@ def login(init_data, user_agent):
         print(f"Login failed with status code: {response.status_code}")
         return False
 
+# Fungsi untuk menghitung akumulasi autoDamage
+def calculate_accumulated_damage(last_login_time, current_time, base_auto_damage):
+    elapsed_time = current_time - last_login_time
+    elapsed_seconds = elapsed_time.total_seconds()
+    accumulated_damage = base_auto_damage + int(elapsed_seconds)
+    return accumulated_damage
+
 # Fungsi untuk melakukan request tap tap
-def tap_tap(auth_header, init_data, user_agent):
+def tap_tap(auth_header, init_data, user_agent, last_login_time):
     url = "https://tapadventure.pixelheroes.io/api/tapTouch"
     headers = {
         "Authorization": auth_header,
@@ -45,26 +52,29 @@ def tap_tap(auth_header, init_data, user_agent):
     }
 
     total_touch_count = 0
-    auto_count = 2
-    auto_damage = 2
+    base_auto_count = 2
+    base_auto_damage = 2
+    current_time = datetime.now()
+
+    accumulated_damage = calculate_accumulated_damage(last_login_time, current_time, base_auto_damage)
 
     for _ in range(10):
         touch_count = random.randint(170, 180)
         total_touch_count += touch_count
         payload = {
             "touchCount": touch_count,
-            "autoCount": auto_count,
-            "autoDamage": auto_damage
+            "autoCount": base_auto_count,
+            "autoDamage": accumulated_damage
         }
         response = requests.post(url, headers=headers, data=json.dumps(payload))
         if response.status_code == 200:
-            print("Tap tap request successful")
+            print(f"Tap tap request successful: {response.json()}")
         elif response.status_code == 202:
-            print("Tap tap request accepted")
+            print(f"Tap tap request accepted: {response.json()}")
         else:
             print(f"Tap tap request failed with status code: {response.status_code}")
-        auto_count += 1
-        auto_damage += 1
+        base_auto_count += 1
+        accumulated_damage += 1
         time.sleep(3)
     
     print(f"Total touch count for this account: {total_touch_count}")
@@ -103,7 +113,13 @@ def main():
 
     # Menanyakan pengguna apakah ingin mengaktifkan tugas gatcha
     gatcha_enabled = input("Do you want to enable the gatcha task? (yes/no): ").strip().lower() == "yes"
+    
+    # Menanyakan pengguna apakah ingin hanya login dan menghitung accumulated damage
+    login_only = input("Do you want to only login and calculate accumulated damage? (yes/no): ").strip().lower() == "yes"
+
     user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0"
+
+    last_login_time = datetime.now() - timedelta(hours=6)
 
     for i in range(num_accounts):
         auth_header = data[i * 2]
@@ -113,24 +129,31 @@ def main():
 
         # Melakukan login sebelum menjalankan tugas
         if login(init_data, user_agent):
-            # Menjalankan tugas tap tap
-            tap_tap(auth_header, init_data, user_agent)
+            if not login_only:
+                # Menjalankan tugas tap tap
+                tap_tap(auth_header, init_data, user_agent, last_login_time)
 
-            if gatcha_enabled:
-                # Menampilkan waktu untuk tugas gatcha berikutnya
-                next_gatcha_time = datetime.now() + timedelta(seconds=5600)
-                print(f"Next gatcha task for account {i + 1} ({username}) will be at {next_gatcha_time.strftime('%Y-%m-%d %H:%M:%S')}")
+                if gatcha_enabled:
+                    # Menampilkan waktu untuk tugas gatcha berikutnya
+                    next_gatcha_time = datetime.now() + timedelta(seconds=5600)
+                    print(f"Next gatcha task for account {i + 1} ({username}) will be at {next_gatcha_time.strftime('%Y-%m-%d %H:%M:%S')}")
 
-                # Menjalankan tugas gatcha
-                gatcha(auth_header, init_data, user_agent)
+                    # Menjalankan tugas gatcha
+                    gatcha(auth_header, init_data, user_agent)
         
         # Jeda 5 detik sebelum akun berikutnya
         time.sleep(5)
     
-    print("All accounts processed. Starting 1 hour countdown.")
-    countdown_timer(3600)
-    print("Restarting process.")
-    main()
+    if login_only:
+        print("All accounts logged in. Starting 6 hours and 5 minutes countdown.")
+        countdown_timer(6 * 3600 + 5 * 60)
+        print("Restarting login process.")
+        main()
+    else:
+        print("All accounts processed. Starting 1 hour countdown.")
+        countdown_timer(3600)
+        print("Restarting process.")
+        main()
 
 if __name__ == "__main__":
     main()
