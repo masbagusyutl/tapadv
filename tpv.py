@@ -29,10 +29,13 @@ def login(init_data, user_agent):
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
         print("Login successful")
-        return True
+        data = response.json()
+        auto_count = data.get('autoCount', 0)
+        auto_damage = data.get('autoDamage', 0)
+        return True, auto_count, auto_damage
     else:
         print(f"Login failed with status code: {response.status_code}")
-        return False
+        return False, None, None
 
 # Fungsi untuk menghitung akumulasi autoDamage
 def calculate_accumulated_damage(last_login_time, current_time, base_auto_damage):
@@ -42,7 +45,7 @@ def calculate_accumulated_damage(last_login_time, current_time, base_auto_damage
     return accumulated_damage
 
 # Fungsi untuk melakukan request tap tap
-def tap_tap(auth_header, init_data, user_agent, last_login_time):
+def tap_tap(auth_header, init_data, user_agent, last_login_time, base_auto_count, base_auto_damage):
     url = "https://tapadventure.pixelheroes.io/api/tapTouch"
     headers = {
         "Authorization": auth_header,
@@ -52,8 +55,6 @@ def tap_tap(auth_header, init_data, user_agent, last_login_time):
     }
 
     total_touch_count = 0
-    base_auto_count = 2
-    base_auto_damage = 2
     current_time = datetime.now()
 
     accumulated_damage = calculate_accumulated_damage(last_login_time, current_time, base_auto_damage)
@@ -68,9 +69,12 @@ def tap_tap(auth_header, init_data, user_agent, last_login_time):
         }
         response = requests.post(url, headers=headers, data=json.dumps(payload))
         if response.status_code == 200:
-            print(f"Tap tap request successful: {response.json()}")
+            print("Tap tap request successful: status 200")
         elif response.status_code == 202:
-            print(f"Tap tap request accepted: {response.json()}")
+            print("Tap tap request accepted: status 202")
+        elif response.status_code == 203:
+            print("Tap tap request failed: REDUNDANT_CONNECTION")
+            break
         else:
             print(f"Tap tap request failed with status code: {response.status_code}")
         base_auto_count += 1
@@ -128,10 +132,11 @@ def main():
         print(f"Processing account {i + 1} of {num_accounts}: {username}")
 
         # Melakukan login sebelum menjalankan tugas
-        if login(init_data, user_agent):
+        login_successful, base_auto_count, base_auto_damage = login(init_data, user_agent)
+        if login_successful:
             if not login_only:
                 # Menjalankan tugas tap tap
-                tap_tap(auth_header, init_data, user_agent, last_login_time)
+                tap_tap(auth_header, init_data, user_agent, last_login_time, base_auto_count, base_auto_damage)
 
                 if gatcha_enabled:
                     # Menampilkan waktu untuk tugas gatcha berikutnya
