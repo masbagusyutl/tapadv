@@ -18,6 +18,22 @@ def extract_username(init_data):
     username = init_data[start:end]
     return urllib.parse.unquote(username)
 
+# Fungsi untuk melakukan login
+def login(init_data, user_agent):
+    url = "https://tapadventure.pixelheroes.io/api/init"
+    headers = {
+        "Initdata": init_data,
+        "User-Agent": user_agent,
+        "Content-Type": "application/json"
+    }
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        print("Login successful")
+        return True
+    else:
+        print(f"Login failed with status code: {response.status_code}")
+        return False
+
 # Fungsi untuk melakukan request tap tap
 def tap_tap(auth_header, init_data, user_agent):
     url = "https://tapadventure.pixelheroes.io/api/tapTouch"
@@ -95,16 +111,18 @@ def main():
         username = extract_username(init_data)
         print(f"Processing account {i + 1} of {num_accounts}: {username}")
 
-        # Menjalankan tugas tap tap
-        tap_tap(auth_header, init_data, user_agent)
+        # Melakukan login sebelum menjalankan tugas
+        if login(init_data, user_agent):
+            # Menjalankan tugas tap tap
+            tap_tap(auth_header, init_data, user_agent)
 
-        if gatcha_enabled:
-            # Menampilkan waktu untuk tugas gatcha berikutnya
-            next_gatcha_time = datetime.now() + timedelta(seconds=5600)
-            print(f"Next gatcha task for account {i + 1} ({username}) will be at {next_gatcha_time.strftime('%Y-%m-%d %H:%M:%S')}")
+            if gatcha_enabled:
+                # Menampilkan waktu untuk tugas gatcha berikutnya
+                next_gatcha_time = datetime.now() + timedelta(seconds=5600)
+                print(f"Next gatcha task for account {i + 1} ({username}) will be at {next_gatcha_time.strftime('%Y-%m-%d %H:%M:%S')}")
 
-            # Menjalankan tugas gatcha
-            gatcha(auth_header, init_data, user_agent)
+                # Menjalankan tugas gatcha
+                gatcha(auth_header, init_data, user_agent)
         
         # Jeda 5 detik sebelum akun berikutnya
         time.sleep(5)
