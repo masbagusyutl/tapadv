@@ -72,7 +72,7 @@ def main():
             # Melakukan login
             login_successful = login(init_data, user_agent)
             if login_successful:
-                print(f"Login successful for account: {username}")
+                print(f"Login successful")
 
             # Tunggu selama 10 detik sebelum berpindah ke akun berikutnya
             countdown_timer(10, message="Switching to next account in")
