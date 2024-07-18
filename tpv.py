@@ -39,7 +39,6 @@ def login(init_data, user_agent):
     }
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
-        print("Login successful")
         return True
     else:
         print(f"Login failed with status code: {response.status_code}")
@@ -73,7 +72,7 @@ def main():
             # Melakukan login
             login_successful = login(init_data, user_agent)
             if login_successful:
-                print(f"Login successful")
+                print(f"Login successful for account: {username}")
 
             # Tunggu selama 10 detik sebelum berpindah ke akun berikutnya
             countdown_timer(10, message="Switching to next account in")
