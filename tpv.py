@@ -18,7 +18,7 @@ def extract_username(init_data):
     username = init_data[start:end]
     return urllib.parse.unquote(username)
 
-# Fungsi untuk melakukan login
+# Fungsi untuk melakukan login dan mendapatkan Authorization baru
 def login(init_data, user_agent):
     url = "https://tapadventure.pixelheroes.io/api/init"
     headers = {
@@ -30,12 +30,13 @@ def login(init_data, user_agent):
     if response.status_code == 200:
         print("Login successful")
         data = response.json()
+        auth_token = data.get('authToken')
         auto_count = data.get('autoCount', 0)
         auto_damage = data.get('autoDamage', 0)
-        return True, auto_count, auto_damage
+        return True, f"Bearer {auth_token}", auto_count, auto_damage
     else:
         print(f"Login failed with status code: {response.status_code}")
-        return False, None, None
+        return False, None, None, None
 
 # Fungsi untuk menghitung akumulasi autoDamage
 def calculate_accumulated_damage(last_login_time, current_time, base_auto_damage):
@@ -126,7 +127,7 @@ def main(gatcha_enabled, login_only):
         print(f"Processing account {i + 1} of {num_accounts}: {username}")
 
         # Melakukan login sebelum menjalankan tugas
-        login_successful, base_auto_count, base_auto_damage = login(init_data, user_agent)
+        login_successful, auth_header, base_auto_count, base_auto_damage = login(init_data, user_agent)
         if login_successful:
             if not login_only:
                 # Menjalankan tugas tap tap
