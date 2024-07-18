@@ -22,9 +22,26 @@ def extract_username(init_data):
 def login(init_data, user_agent):
     url = "https://tapadventure.pixelheroes.io/api/init"
     headers = {
+        ":authority": "tapadventure.pixelheroes.io",
+        ":method": "GET",
+        ":path": "/api/init",
+        ":scheme": "https",
+        "Accept": "*/*",
+        "Accept-Encoding": "gzip, deflate, br, zstd",
+        "Accept-Language": "en-GB,en;q=0.9,en-US;q=0.8",
+        "Cache-Control": "no-cache",
         "Initdata": init_data,
-        "User-Agent": user_agent,
-        "Content-Type": "application/json"
+        "Origin": "https://d2y873tmoumjr5.cloudfront.net",
+        "Pragma": "no-cache",
+        "Priority": "u=1, i",
+        "Referer": "https://d2y873tmoumjr5.cloudfront.net/",
+        "Sec-Ch-Ua": "\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Microsoft Edge\";v=\"126\", \"Microsoft Edge WebView2\";v=\"126\"",
+        "Sec-Ch-Ua-Mobile": "?0",
+        "Sec-Ch-Ua-Platform": "\"Windows\"",
+        "Sec-Fetch-Dest": "empty",
+        "Sec-Fetch-Mode": "cors",
+        "Sec-Fetch-Site": "cross-site",
+        "User-Agent": user_agent
     }
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
@@ -49,10 +66,29 @@ def calculate_accumulated_damage(last_login_time, current_time, base_auto_damage
 def tap_tap(auth_header, init_data, user_agent, last_login_time, base_auto_count, base_auto_damage):
     url = "https://tapadventure.pixelheroes.io/api/tapTouch"
     headers = {
+        ":authority": "tapadventure.pixelheroes.io",
+        ":method": "POST",
+        ":path": "/api/tapTouch",
+        ":scheme": "https",
+        "Accept": "*/*",
+        "Accept-Encoding": "gzip, deflate, br, zstd",
+        "Accept-Language": "en-GB,en;q=0.9,en-US;q=0.8",
         "Authorization": auth_header,
+        "Cache-Control": "no-cache",
+        "Content-Length": "49",
+        "Content-Type": "application/json",
         "Initdata": init_data,
-        "User-Agent": user_agent,
-        "Content-Type": "application/json"
+        "Origin": "https://d2y873tmoumjr5.cloudfront.net",
+        "Pragma": "no-cache",
+        "Priority": "u=1, i",
+        "Referer": "https://d2y873tmoumjr5.cloudfront.net/",
+        "Sec-Ch-Ua": "\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Microsoft Edge\";v=\"126\", \"Microsoft Edge WebView2\";v=\"126\"",
+        "Sec-Ch-Ua-Mobile": "?0",
+        "Sec-Ch-Ua-Platform": "\"Windows\"",
+        "Sec-Fetch-Dest": "empty",
+        "Sec-Fetch-Mode": "cors",
+        "Sec-Fetch-Site": "cross-site",
+        "User-Agent": user_agent
     }
 
     total_touch_count = 0
@@ -88,10 +124,29 @@ def tap_tap(auth_header, init_data, user_agent, last_login_time, base_auto_count
 def gatcha(auth_header, init_data, user_agent):
     url = "https://tapadventure.pixelheroes.io/api/gatCha"
     headers = {
+        ":authority": "tapadventure.pixelheroes.io",
+        ":method": "POST",
+        ":path": "/api/gatCha",
+        ":scheme": "https",
+        "Accept": "*/*",
+        "Accept-Encoding": "gzip, deflate, br, zstd",
+        "Accept-Language": "en-GB,en;q=0.9,en-US;q=0.8",
         "Authorization": auth_header,
+        "Cache-Control": "no-cache",
+        "Content-Length": "2",
+        "Content-Type": "application/json",
         "Initdata": init_data,
-        "User-Agent": user_agent,
-        "Content-Type": "application/json"
+        "Origin": "https://d2y873tmoumjr5.cloudfront.net",
+        "Pragma": "no-cache",
+        "Priority": "u=1, i",
+        "Referer": "https://d2y873tmoumjr5.cloudfront.net/",
+        "Sec-Ch-Ua": "\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Microsoft Edge\";v=\"126\", \"Microsoft Edge WebView2\";v=\"126\"",
+        "Sec-Ch-Ua-Mobile": "?0",
+        "Sec-Ch-Ua-Platform": "\"Windows\"",
+        "Sec-Fetch-Dest": "empty",
+        "Sec-Fetch-Mode": "cors",
+        "Sec-Fetch-Site": "cross-site",
+        "User-Agent": user_agent
     }
     response = requests.post(url, headers=headers)
     if response.status_code == 200:
@@ -134,28 +189,27 @@ def main(gatcha_enabled, login_only):
                 tap_tap(auth_header, init_data, user_agent, last_login_time, base_auto_count, base_auto_damage)
 
             if gatcha_enabled:
-                # Menampilkan waktu untuk tugas gatcha berikutnya
-                next_gatcha_time = datetime.now() + timedelta(seconds=5600)
-                print(f"Next gatcha task for account {i + 1} ({username}) will be at {next_gatcha_time.strftime('%Y-%m-%d %H:%M:%S')}")
-
                 # Menjalankan tugas gatcha
                 gatcha(auth_header, init_data, user_agent)
-        
-        # Jeda 5 detik sebelum akun berikutnya
-        time.sleep(5)
-    
-    if login_only:
-        print("All accounts logged in. Starting 6 hours and 5 minutes countdown.")
-        countdown_timer(6 * 3600 + 5 * 60)
-        print("Restarting login process.")
+
+            last_login_time = datetime.now()
+
+        # Tunggu selama 10 detik sebelum berpindah ke akun berikutnya
+        countdown_timer(10)
+
+    # Hitung mundur selama 7 jam sebelum restart
+    print("Starting 7-hour countdown before restart...")
+    countdown_timer(7 * 60 * 60)
+
+    # Tanyakan apakah pengguna ingin menjalankan kode lagi atau tidak
+    run_again = input("Do you want to run the code again? (y/n): ")
+    if run_again.lower() == 'y':
         main(gatcha_enabled, login_only)
     else:
-        print("All accounts processed. Starting 1 hour countdown.")
-        countdown_timer(3600)
-        print("Restarting process.")
-        main(gatcha_enabled, login_only)
+        print("Process completed.")
 
+# Menjalankan kode utama dengan pilihan dari pengguna
 if __name__ == "__main__":
-    gatcha_enabled = input("Do you want to enable the gatcha task? (yes/no): ").strip().lower() == "yes"
-    login_only = input("Do you want to only login and calculate accumulated damage? (yes/no): ").strip().lower() == "yes"
+    gatcha_enabled = input("Enable gatcha tasks? (y/n): ").strip().lower() == 'y'
+    login_only = input("Login only mode? (y/n): ").strip().lower() == 'y'
     main(gatcha_enabled, login_only)
