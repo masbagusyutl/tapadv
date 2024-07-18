@@ -45,15 +45,15 @@ def login(init_data, user_agent):
         print(f"Login failed with status code: {response.status_code}")
         return False
 
-# Fungsi untuk menjalankan hitung mundur
-def countdown_timer(seconds):
+# Fungsi untuk menjalankan hitung mundur dengan pesan
+def countdown_timer(seconds, message=""):
     for remaining in range(seconds, 0, -1):
         hours, rem = divmod(remaining, 3600)
         minutes, seconds = divmod(rem, 60)
         timeformat = '{:02d}:{:02d}:{:02d}'.format(hours, minutes, seconds)
-        print(timeformat, end='\r')
+        print(f"{message} {timeformat}", end='\r')
         time.sleep(1)
-    print("Countdown finished.")
+    print(f"{message} 00:00:00")
 
 # Fungsi utama untuk mengelola semua proses
 def main():
@@ -63,30 +63,28 @@ def main():
 
     user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0"
 
-    for i in range(num_accounts):
-        auth_header = data[i * 2]
-        init_data = data[i * 2 + 1]
-        username = extract_username(init_data)
-        print(f"Processing account {i + 1} of {num_accounts}: {username}")
+    while True:
+        for i in range(num_accounts):
+            auth_header = data[i * 2]
+            init_data = data[i * 2 + 1]
+            username = extract_username(init_data)
+            print(f"Processing account {i + 1} of {num_accounts}: {username}")
 
-        # Melakukan login
-        login_successful = login(init_data, user_agent)
-        if login_successful:
-            print(f"Login successful for account: {username}")
+            # Melakukan login
+            login_successful = login(init_data, user_agent)
+            if login_successful:
+                print(f"Login successful for account: {username}")
 
-        # Tunggu selama 10 detik sebelum berpindah ke akun berikutnya
-        countdown_timer(10)
+            # Tunggu selama 10 detik sebelum berpindah ke akun berikutnya
+            countdown_timer(10)
 
-    # Hitung mundur selama 6 jam 5 menit sebelum restart
-    print("Starting 6-hour 5-minute countdown before restart...")
-    countdown_timer(6 * 3600 + 5 * 60)
+        # Hitung mundur selama 6 jam 5 menit sebelum restart
+        print("Starting 6-hour 5-minute countdown before restart...", end=' ')
+        countdown_timer(6 * 3600 + 5 * 60)
 
-    # Tanyakan apakah pengguna ingin menjalankan kode lagi atau tidak
-    run_again = input("Do you want to run the code again? (y/n): ")
-    if run_again.lower() == 'y':
-        main()
-    else:
-        print("Process completed.")
+        # Ulangi proses dari awal setelah hitung mundur selesai
+        print("Restarting the process...")
+        time.sleep(5)  # Tunggu 5 detik sebelum memulai kembali
 
 # Menjalankan kode utama
 if __name__ == "__main__":
