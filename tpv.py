@@ -110,16 +110,10 @@ def countdown_timer(seconds):
     print("Countdown finished.")
 
 # Fungsi utama untuk mengelola semua proses
-def main():
+def main(gatcha_enabled, login_only):
     data = read_data('data.txt')
     num_accounts = len(data) // 2
     print(f"Total accounts: {num_accounts}")
-
-    # Menanyakan pengguna apakah ingin mengaktifkan tugas gatcha
-    gatcha_enabled = input("Do you want to enable the gatcha task? (yes/no): ").strip().lower() == "yes"
-    
-    # Menanyakan pengguna apakah ingin hanya login dan menghitung accumulated damage
-    login_only = input("Do you want to only login and calculate accumulated damage? (yes/no): ").strip().lower() == "yes"
 
     user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0"
 
@@ -153,12 +147,14 @@ def main():
         print("All accounts logged in. Starting 6 hours and 5 minutes countdown.")
         countdown_timer(6 * 3600 + 5 * 60)
         print("Restarting login process.")
-        main()
+        main(gatcha_enabled, login_only)
     else:
         print("All accounts processed. Starting 1 hour countdown.")
         countdown_timer(3600)
         print("Restarting process.")
-        main()
+        main(gatcha_enabled, login_only)
 
 if __name__ == "__main__":
-    main()
+    gatcha_enabled = input("Do you want to enable the gatcha task? (yes/no): ").strip().lower() == "yes"
+    login_only = input("Do you want to only login and calculate accumulated damage? (yes/no): ").strip().lower() == "yes"
+    main(gatcha_enabled, login_only)
