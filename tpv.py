@@ -132,13 +132,13 @@ def main(gatcha_enabled, login_only):
                 # Menjalankan tugas tap tap
                 tap_tap(auth_header, init_data, user_agent, last_login_time, base_auto_count, base_auto_damage)
 
-                if gatcha_enabled:
-                    # Menampilkan waktu untuk tugas gatcha berikutnya
-                    next_gatcha_time = datetime.now() + timedelta(seconds=5600)
-                    print(f"Next gatcha task for account {i + 1} ({username}) will be at {next_gatcha_time.strftime('%Y-%m-%d %H:%M:%S')}")
+            if gatcha_enabled:
+                # Menampilkan waktu untuk tugas gatcha berikutnya
+                next_gatcha_time = datetime.now() + timedelta(seconds=5600)
+                print(f"Next gatcha task for account {i + 1} ({username}) will be at {next_gatcha_time.strftime('%Y-%m-%d %H:%M:%S')}")
 
-                    # Menjalankan tugas gatcha
-                    gatcha(auth_header, init_data, user_agent)
+                # Menjalankan tugas gatcha
+                gatcha(auth_header, init_data, user_agent)
         
         # Jeda 5 detik sebelum akun berikutnya
         time.sleep(5)
