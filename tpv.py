@@ -22,10 +22,6 @@ def extract_username(init_data):
 def login(init_data, user_agent):
     url = "https://tapadventure.pixelheroes.io/api/init"
     headers = {
-        ":authority": "tapadventure.pixelheroes.io",
-        ":method": "GET",
-        ":path": "/api/init",
-        ":scheme": "https",
         "Accept": "*/*",
         "Accept-Encoding": "gzip, deflate, br, zstd",
         "Accept-Language": "en-GB,en;q=0.9,en-US;q=0.8",
@@ -33,7 +29,6 @@ def login(init_data, user_agent):
         "Initdata": init_data,
         "Origin": "https://d2y873tmoumjr5.cloudfront.net",
         "Pragma": "no-cache",
-        "Priority": "u=1, i",
         "Referer": "https://d2y873tmoumjr5.cloudfront.net/",
         "Sec-Ch-Ua": "\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Microsoft Edge\";v=\"126\", \"Microsoft Edge WebView2\";v=\"126\"",
         "Sec-Ch-Ua-Mobile": "?0",
@@ -66,10 +61,6 @@ def calculate_accumulated_damage(last_login_time, current_time, base_auto_damage
 def tap_tap(auth_header, init_data, user_agent, last_login_time, base_auto_count, base_auto_damage):
     url = "https://tapadventure.pixelheroes.io/api/tapTouch"
     headers = {
-        ":authority": "tapadventure.pixelheroes.io",
-        ":method": "POST",
-        ":path": "/api/tapTouch",
-        ":scheme": "https",
         "Accept": "*/*",
         "Accept-Encoding": "gzip, deflate, br, zstd",
         "Accept-Language": "en-GB,en;q=0.9,en-US;q=0.8",
@@ -80,7 +71,6 @@ def tap_tap(auth_header, init_data, user_agent, last_login_time, base_auto_count
         "Initdata": init_data,
         "Origin": "https://d2y873tmoumjr5.cloudfront.net",
         "Pragma": "no-cache",
-        "Priority": "u=1, i",
         "Referer": "https://d2y873tmoumjr5.cloudfront.net/",
         "Sec-Ch-Ua": "\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Microsoft Edge\";v=\"126\", \"Microsoft Edge WebView2\";v=\"126\"",
         "Sec-Ch-Ua-Mobile": "?0",
@@ -124,10 +114,6 @@ def tap_tap(auth_header, init_data, user_agent, last_login_time, base_auto_count
 def gatcha(auth_header, init_data, user_agent):
     url = "https://tapadventure.pixelheroes.io/api/gatCha"
     headers = {
-        ":authority": "tapadventure.pixelheroes.io",
-        ":method": "POST",
-        ":path": "/api/gatCha",
-        ":scheme": "https",
         "Accept": "*/*",
         "Accept-Encoding": "gzip, deflate, br, zstd",
         "Accept-Language": "en-GB,en;q=0.9,en-US;q=0.8",
@@ -138,7 +124,6 @@ def gatcha(auth_header, init_data, user_agent):
         "Initdata": init_data,
         "Origin": "https://d2y873tmoumjr5.cloudfront.net",
         "Pragma": "no-cache",
-        "Priority": "u=1, i",
         "Referer": "https://d2y873tmoumjr5.cloudfront.net/",
         "Sec-Ch-Ua": "\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Microsoft Edge\";v=\"126\", \"Microsoft Edge WebView2\";v=\"126\"",
         "Sec-Ch-Ua-Mobile": "?0",
