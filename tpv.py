@@ -51,9 +51,9 @@ def countdown_timer(seconds, message=""):
         hours, rem = divmod(remaining, 3600)
         minutes, seconds = divmod(rem, 60)
         timeformat = '{:02d}:{:02d}:{:02d}'.format(hours, minutes, seconds)
-        print(f"{message} {timeformat}", end='\r')
+        print(f"\r{message} {timeformat}", end='')
         time.sleep(1)
-    print(f"{message} 00:00:00")
+    print(f"\r{message} 00:00:00")
 
 # Fungsi utama untuk mengelola semua proses
 def main():
@@ -73,17 +73,16 @@ def main():
             # Melakukan login
             login_successful = login(init_data, user_agent)
             if login_successful:
-                print(f"Login successful for account: {username}")
+                print(f"Login successful")
 
             # Tunggu selama 10 detik sebelum berpindah ke akun berikutnya
-            countdown_timer(10)
+            countdown_timer(10, message="Switching to next account in")
 
         # Hitung mundur selama 6 jam 5 menit sebelum restart
-        print("Starting 6-hour 5-minute countdown before restart...", end=' ')
-        countdown_timer(6 * 3600 + 5 * 60)
+        countdown_timer(6 * 3600 + 5 * 60, message="Restart process in")
 
         # Ulangi proses dari awal setelah hitung mundur selesai
-        print("Restarting the process...")
+        print("\nRestarting the process...")
         time.sleep(5)  # Tunggu 5 detik sebelum memulai kembali
 
 # Menjalankan kode utama
