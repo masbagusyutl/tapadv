@@ -1,7 +1,6 @@
 import time
 import requests
-import json
-from datetime import datetime, timedelta
+import urllib.parse
 
 # Fungsi untuk membaca data dari file data.txt
 def read_data(file_path):
@@ -11,7 +10,6 @@ def read_data(file_path):
 
 # Fungsi untuk mengambil nama pengguna dari init_data
 def extract_username(init_data):
-    import urllib.parse
     start = init_data.find("username%22%3A%22") + len("username%22%3A%22")
     end = init_data.find("%22", start)
     username = init_data[start:end]
@@ -56,7 +54,7 @@ def countdown_timer(seconds, message=""):
 
 # Fungsi utama untuk mengelola semua proses
 def main():
-    data = read_data('data.txt')
+    data = read_data('/home/ubuntu/data.txt')
     num_accounts = len(data) // 2
     print(f"Total accounts: {num_accounts}")
 
