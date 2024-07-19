@@ -1,6 +1,8 @@
 import time
 import requests
 import urllib.parse
+from datetime import datetime, timedelta
+import os
 
 # Fungsi untuk membaca data dari file data.txt
 def read_data(file_path):
@@ -54,11 +56,14 @@ def countdown_timer(seconds, message=""):
 
 # Fungsi utama untuk mengelola semua proses
 def main():
-    data = read_data('/home/ubuntu/data.txt')
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    data_file = os.path.join(script_dir, 'data.txt')
+    
+    data = read_data(data_file)
     num_accounts = len(data) // 2
     print(f"Total accounts: {num_accounts}")
 
-    user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0"
+    user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, seperti Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0"
 
     while True:
         for i in range(num_accounts):
