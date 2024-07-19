@@ -64,15 +64,14 @@ def main():
 
     while True:
         for i in range(num_accounts):
-            auth_header = data[i * 2]
-            init_data = data[i * 2 + 1]
+            init_data = data[i * 2]
             username = extract_username(init_data)
             print(f"Processing account {i + 1} of {num_accounts}: {username}")
 
             # Melakukan login
             login_successful = login(init_data, user_agent)
             if login_successful:
-                print(f"Login successful")
+                print(f"Login successful for account: {username}")
 
             # Tunggu selama 10 detik sebelum berpindah ke akun berikutnya
             countdown_timer(10, message="Switching to next account in")
