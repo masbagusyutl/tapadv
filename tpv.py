@@ -5,10 +5,10 @@ import urllib.parse
 
 # Baca data dari file
 with open('data.txt', 'r') as file:
-    data = file.read().split("\n\n")
+    data = file.read().strip().split("\n\n")
 
 # Pisahkan data Initdata dan Authorization
-initdata_list = [block.split('\n')[1].split(": ")[1] for block in data if 'Initdata:' in block]
+initdata_list = [block.split('\n')[0].split(": ")[1] for block in data if 'Initdata:' in block]
 authorization_list = [block.split('\n')[1].split(": ")[1] for block in data if 'Authorization: Bearer ' in block]
 
 # Fungsi untuk mengekstrak nama pengguna dari Initdata
