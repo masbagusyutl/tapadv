@@ -1,107 +1,92 @@
 import requests
 import time
-import json
 from datetime import datetime, timedelta
 import urllib.parse
 
-# Fungsi untuk membaca data akun dari data.txt
-def read_accounts(file_path):
-    with open(file_path, 'r') as file:
-        accounts = file.readlines()
-    return [account.strip() for account in accounts]
+# Baca data dari file
+with open('data.txt', 'r') as file:
+    data = file.read().split("\n\n")
 
-# Fungsi untuk menulis data authorization ke authorization.txt
-def write_authorization(data):
-    with open('authorization.txt', 'w') as file:
-        json.dump(data, file)
+# Pisahkan data Initdata dan Authorization
+initdata_list = [block.split('\n')[1].split(": ")[1] for block in data if 'Initdata:' in block]
+authorization_list = [block.split('\n')[1].split(": ")[1] for block in data if 'Authorization: Bearer ' in block]
 
-# Fungsi untuk membaca data authorization dari authorization.txt
-def read_authorization():
-    with open('authorization.txt', 'r') as file:
-        return json.load(file)
+# Fungsi untuk mengekstrak nama pengguna dari Initdata
+def ambil_nama_pengguna(initdata):
+    params = urllib.parse.parse_qs(initdata)
+    user_info = params.get('user', [''])[0]
+    username_start = user_info.find('username%22%3A%22') + len('username%22%3A%22')
+    username_end = user_info.find('%22', username_start)
+    if username_start > len('username%22%3A%22') - 1 and username_end > username_start:
+        username = urllib.parse.unquote(user_info[username_start:username_end])
+        return username
+    return "Unknown"
 
-# Fungsi untuk login dan mendapatkan data authorization
-def login_and_get_authorization(account):
+# Fungsi untuk tugas login
+def tugas_login(initdata):
     url = "https://tapadventure.pixelheroes.io/api/init"
     headers = {
-        'Accept': '*/*',
-        'Accept-Encoding': 'gzip, deflate, br, zstd',
-        'Accept-Language': 'en-GB,en;q=0.9,en-US;q=0.8',
-        'Cache-Control': 'no-cache',
-        'Pragma': 'no-cache',
-        'Referer': 'https://d2y873tmoumjr5.cloudfront.net/',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0'
+        "authority": "tapadventure.pixelheroes.io",
+        "method": "GET",
+        "path": "/api/init",
+        "scheme": "https",
+        "Accept": "*/*",
+        "Accept-Encoding": "gzip, deflate, br, zstd",
+        "Accept-Language": "en-GB,en;q=0.9,en-US;q=0.8",
+        "Cache-Control": "no-cache",
+        "User-Agent": "Mozilla/5.0",
+        "Initdata": initdata
     }
-    params = {'Initdata': account}
-    response = requests.get(url, headers=headers, params=params)
-    try:
-        data = response.json()
-        print("Response data:", data)  # Debug output to see the response data
-        if 'body' in data and 'authorization' in data['body']:
-            return data['body']['authorization']
-        else:
-            print(f"Authorization not found in response for account: {account}")
-            return None
-    except json.JSONDecodeError:
-        print(f"Failed to decode JSON for account: {account}")
-        print("Response text:", response.text)
-        return None
+    response = requests.get(url, headers=headers)
+    return response.status_code
 
-# Fungsi untuk menjalankan tugas kehadiran harian
-def daily_attendance(authorization):
+# Fungsi untuk tugas kehadiran harian
+def tugas_kehadiran_harian(initdata, auth):
     url = "https://tapadventure.pixelheroes.io/api/receiveAttendanceReward"
     headers = {
-        'Accept': '*/*',
-        'Accept-Encoding': 'gzip, deflate, br, zstd',
-        'Accept-Language': 'en-GB,en;q=0.9,en-US;q=0.8',
-        'Authorization': f"Bearer {authorization}",
-        'Cache-Control': 'no-cache',
-        'Content-Length': '2',
-        'Content-Type': 'application/json',
-        'Pragma': 'no-cache',
-        'Referer': 'https://d2y873tmoumjr5.cloudfront.net/',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0'
+        "authority": "tapadventure.pixelheroes.io",
+        "method": "POST",
+        "path": "/api/receiveAttendanceReward",
+        "scheme": "https",
+        "Accept": "*/*",
+        "Accept-Encoding": "gzip, deflate, br, zstd",
+        "Accept-Language": "en-GB,en;q=0.9,en-US;q=0.8",
+        "Authorization": f"Bearer {auth}",
+        "Cache-Control": "no-cache",
+        "Content-Type": "application/json",
+        "User-Agent": "Mozilla/5.0",
+        "Initdata": initdata
     }
     response = requests.post(url, headers=headers, json={})
-    if response.status_code == 200:
-        print("Daily attendance successful")
-    else:
-        print("Daily attendance failed")
+    return response.status_code
 
-# Fungsi untuk mengekstrak nama pengguna dari data URL-encoded
-def extract_username(account):
-    parsed_data = urllib.parse.parse_qs(account)
-    user_info = parsed_data.get('user', [''])[0]
-    user_info_decoded = urllib.parse.unquote(user_info)
-    user_json = json.loads(user_info_decoded)
-    return user_json.get('username', 'unknown')
+# Fungsi utama untuk menjalankan tugas
+def jalankan_tugas():
+    akun_total = len(initdata_list)
+    for idx, (initdata, auth) in enumerate(zip(initdata_list, authorization_list)):
+        username = ambil_nama_pengguna(initdata)
+        print(f"Memproses akun {idx+1} dari {akun_total} - Username: {username}")
+        login_status = tugas_login(initdata)
+        if login_status == 200:
+            print(f"Login sukses untuk {username}")
+        else:
+            print(f"Login gagal untuk {username}")
 
-# Fungsi utama untuk menjalankan proses
-def main():
-    accounts = read_accounts('data.txt')
-    total_accounts = len(accounts)
-    print(f"Total accounts: {total_accounts}")
-    
-    # Proses login dan tugas kehadiran harian
-    for i, account in enumerate(accounts):
-        username = extract_username(account)
-        print(f"Processing account {i + 1}/{total_accounts} - {username}")
-        authorization = login_and_get_authorization(account)
-        if authorization:
-            daily_attendance(authorization)
-            write_authorization({username: authorization})
+        attendance_status = tugas_kehadiran_harian(initdata, auth)
+        if attendance_status == 200:
+            print(f"Kehadiran harian sukses untuk {username}")
+        else:
+            print(f"Kehadiran harian gagal untuk {username}")
+
         time.sleep(5)  # Jeda 5 detik antar akun
     
     # Hitung mundur 6 jam
     next_run_time = datetime.now() + timedelta(hours=6)
-    print(f"Next run at {next_run_time.strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"Tugas harian selesai. Akan dimulai lagi pada {next_run_time.strftime('%Y-%m-%d %H:%M:%S')}")
     while datetime.now() < next_run_time:
-        time_left = next_run_time - datetime.now()
-        print(f"Time left: {time_left}", end='\r')
+        remaining_time = next_run_time - datetime.now()
+        print(f"Hitung mundur: {remaining_time}", end='\r')
         time.sleep(1)
-    
-    # Mulai ulang proses
-    main()
 
-if __name__ == "__main__":
-    main()
+while True:
+    jalankan_tugas()
