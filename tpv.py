@@ -32,12 +32,14 @@ def login_and_get_authorization(account):
         'Referer': 'https://d2y873tmoumjr5.cloudfront.net/',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0'
     }
-    response = requests.get(url, headers=headers, params={'Initdata': account})
-    if response.status_code == 200:
+    params = {'Initdata': account}
+    response = requests.get(url, headers=headers, params=params)
+    try:
         data = response.json()
         return data['body']['authorization']
-    else:
-        print(f"Login failed for account: {account}")
+    except json.JSONDecodeError:
+        print(f"Failed to decode JSON for account: {account}")
+        print("Response text:", response.text)
         return None
 
 # Fungsi untuk menjalankan tugas kehadiran harian
