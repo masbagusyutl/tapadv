@@ -36,7 +36,12 @@ def login_and_get_authorization(account):
     response = requests.get(url, headers=headers, params=params)
     try:
         data = response.json()
-        return data['body']['authorization']
+        print("Response data:", data)  # Debug output to see the response data
+        if 'body' in data and 'authorization' in data['body']:
+            return data['body']['authorization']
+        else:
+            print(f"Authorization not found in response for account: {account}")
+            return None
     except json.JSONDecodeError:
         print(f"Failed to decode JSON for account: {account}")
         print("Response text:", response.text)
