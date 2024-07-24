@@ -5,11 +5,16 @@ import urllib.parse
 
 # Baca data dari file
 with open('data.txt', 'r') as file:
-    data = file.read().strip().split("\n\n")
+    lines = file.read().strip().split('\n')
 
 # Pisahkan data Initdata dan Authorization
-initdata_list = [block.split('\n')[0].split(": ")[1] for block in data if 'Initdata:' in block]
-authorization_list = [block.split('\n')[1].split(": ")[1] for block in data if 'Authorization: Bearer ' in block]
+initdata_list = []
+authorization_list = []
+
+for i in range(0, len(lines), 2):
+    if i + 1 < len(lines):
+        initdata_list.append(lines[i].split(': ')[1])
+        authorization_list.append(lines[i + 1].split(': ')[1])
 
 # Fungsi untuk mengekstrak nama pengguna dari Initdata
 def ambil_nama_pengguna(initdata):
@@ -68,13 +73,16 @@ def jalankan_tugas():
         print(f"Memproses akun {idx+1} dari {akun_total} - Username: {username}")
 
         # Tugas login
+        print(f"Memulai tugas login untuk {username}")
         login_status = tugas_login(initdata)
         if login_status == 200:
             print(f"Login sukses untuk {username}")
         else:
             print(f"Login gagal untuk {username}")
+            continue  # Lewati tugas kehadiran harian jika login gagal
 
         # Tugas kehadiran harian
+        print(f"Memulai tugas kehadiran harian untuk {username}")
         attendance_status = tugas_kehadiran_harian(initdata, auth)
         if attendance_status == 200:
             print(f"Kehadiran harian sukses untuk {username}")
@@ -85,7 +93,7 @@ def jalankan_tugas():
 
     # Hitung mundur 6 jam
     next_run_time = datetime.now() + timedelta(hours=6)
-    print(f"Tugas harian selesai. Akan dimulai lagi pada {next_run_time.strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"\nSemua akun telah diproses. Hitung mundur 6 jam hingga {next_run_time.strftime('%Y-%m-%d %H:%M:%S')}")
     while datetime.now() < next_run_time:
         remaining_time = next_run_time - datetime.now()
         print(f"Hitung mundur: {remaining_time}", end='\r')
