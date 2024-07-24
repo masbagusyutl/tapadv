@@ -66,12 +66,15 @@ def jalankan_tugas():
     for idx, (initdata, auth) in enumerate(zip(initdata_list, authorization_list)):
         username = ambil_nama_pengguna(initdata)
         print(f"Memproses akun {idx+1} dari {akun_total} - Username: {username}")
+
+        # Tugas login
         login_status = tugas_login(initdata)
         if login_status == 200:
             print(f"Login sukses untuk {username}")
         else:
             print(f"Login gagal untuk {username}")
 
+        # Tugas kehadiran harian
         attendance_status = tugas_kehadiran_harian(initdata, auth)
         if attendance_status == 200:
             print(f"Kehadiran harian sukses untuk {username}")
@@ -79,7 +82,7 @@ def jalankan_tugas():
             print(f"Kehadiran harian gagal untuk {username}")
 
         time.sleep(5)  # Jeda 5 detik antar akun
-    
+
     # Hitung mundur 6 jam
     next_run_time = datetime.now() + timedelta(hours=6)
     print(f"Tugas harian selesai. Akan dimulai lagi pada {next_run_time.strftime('%Y-%m-%d %H:%M:%S')}")
