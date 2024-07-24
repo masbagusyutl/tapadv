@@ -1,6 +1,7 @@
 import time
 from datetime import datetime, timedelta
 import urllib.parse
+import requests
 
 # Baca data dari file
 with open('data.txt', 'r') as file:
@@ -14,17 +15,6 @@ authorization_list = []
 for i in range(0, len(lines), 2):
     initdata_list.append(lines[i])
     authorization_list.append(lines[i + 1])
-
-# Fungsi untuk mengekstrak nama pengguna dari Initdata
-def ambil_nama_pengguna(initdata):
-    params = urllib.parse.parse_qs(initdata)
-    user_info = params.get('user', [''])[0]
-    username_start = user_info.find('username%22%3A%22') + len('username%22%3A%22')
-    username_end = user_info.find('%22', username_start)
-    if username_start > len('username%22%3A%22') - 1 and username_end > username_start:
-        username = urllib.parse.unquote(user_info[username_start:username_end])
-        return username
-    return "Unknown"
 
 # Fungsi untuk tugas login
 def tugas_login(initdata):
@@ -41,10 +31,8 @@ def tugas_login(initdata):
         "User-Agent": "Mozilla/5.0",
         "Initdata": initdata
     }
-    # Tidak melakukan request karena tidak mengimport requests
-    print(f"Tugas login untuk Initdata: {initdata}")
-    # Simulasi response status code
-    return 200
+    response = requests.get(url, headers=headers)
+    return response.status_code
 
 # Fungsi untuk tugas kehadiran harian
 def tugas_kehadiran_harian(initdata, auth):
@@ -63,34 +51,29 @@ def tugas_kehadiran_harian(initdata, auth):
         "User-Agent": "Mozilla/5.0",
         "Initdata": initdata
     }
-    # Tidak melakukan request karena tidak mengimport requests
-    print(f"Tugas kehadiran harian untuk Initdata: {initdata} dengan Authorization: {auth}")
-    # Simulasi response status code
-    return 200
+    response = requests.post(url, headers=headers, json={})
+    return response.status_code
 
 # Fungsi utama untuk menjalankan tugas
 def jalankan_tugas():
     akun_total = len(initdata_list)
     for idx, (initdata, auth) in enumerate(zip(initdata_list, authorization_list)):
-        username = ambil_nama_pengguna(initdata)
-        print(f"Memproses akun {idx+1} dari {akun_total} - Username: {username}")
-
         # Tugas login
-        print(f"Memulai tugas login untuk {username}")
+        print(f"Akun {idx+1} - Memulai tugas login")
         login_status = tugas_login(initdata)
         if login_status == 200:
-            print(f"Login sukses untuk {username}")
+            print(f"Akun {idx+1} berhasil login")
         else:
-            print(f"Login gagal untuk {username}")
+            print(f"Akun {idx+1} gagal login")
             continue  # Lewati tugas kehadiran harian jika login gagal
 
         # Tugas kehadiran harian
-        print(f"Memulai tugas kehadiran harian untuk {username}")
+        print(f"Akun {idx+1} - Memulai tugas kehadiran harian")
         attendance_status = tugas_kehadiran_harian(initdata, auth)
         if attendance_status == 200:
-            print(f"Kehadiran harian sukses untuk {username}")
+            print(f"Akun {idx+1} berhasil menyelesaikan tugas harian")
         else:
-            print(f"Kehadiran harian gagal untuk {username}")
+            print(f"Akun {idx+1} gagal menyelesaikan tugas harian")
 
         time.sleep(5)  # Jeda 5 detik antar akun
 
