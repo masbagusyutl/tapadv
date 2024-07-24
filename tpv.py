@@ -11,10 +11,10 @@ with open('data.txt', 'r') as file:
 initdata_list = []
 authorization_list = []
 
+# Mengasumsikan data setiap akun dimulai dengan baris query_id, diikuti oleh baris auth
 for i in range(0, len(lines), 2):
-    if i + 1 < len(lines):
-        initdata_list.append(lines[i].split(': ')[1])
-        authorization_list.append(lines[i + 1].split(': ')[1])
+    initdata_list.append(lines[i])
+    authorization_list.append(lines[i + 1])
 
 # Fungsi untuk mengekstrak nama pengguna dari Initdata
 def ambil_nama_pengguna(initdata):
