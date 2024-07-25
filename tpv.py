@@ -1,6 +1,5 @@
 import time
 from datetime import datetime, timedelta
-import urllib.parse
 import requests
 
 # Baca data dari file
@@ -54,11 +53,11 @@ def tugas_kehadiran_harian(initdata, auth):
     response = requests.post(url, headers=headers, json={})
     return response.status_code
 
-# Fungsi utama untuk menjalankan tugas
-def jalankan_tugas():
+# Fungsi untuk menjalankan tugas login
+def jalankan_tugas_login():
     akun_total = len(initdata_list)
-    for idx, (initdata, auth) in enumerate(zip(initdata_list, authorization_list)):
-        print(f"Memproses akun {idx+1} dari {akun_total}")
+    for idx, initdata in enumerate(initdata_list):
+        print(f"Memproses login untuk akun {idx+1} dari {akun_total}")
 
         # Tugas login
         print(f"Memulai tugas login untuk akun {idx+1}")
@@ -67,7 +66,14 @@ def jalankan_tugas():
             print(f"Akun {idx+1} berhasil login")
         else:
             print(f"Akun {idx+1} gagal login")
-            continue  # Lewati tugas kehadiran harian jika login gagal
+
+        time.sleep(5)  # Jeda 5 detik antar akun
+
+# Fungsi untuk menjalankan tugas kehadiran harian
+def jalankan_tugas_kehadiran():
+    akun_total = len(initdata_list)
+    for idx, (initdata, auth) in enumerate(zip(initdata_list, authorization_list)):
+        print(f"Memproses kehadiran harian untuk akun {idx+1} dari {akun_total}")
 
         # Tugas kehadiran harian
         print(f"Memulai tugas kehadiran harian untuk akun {idx+1}")
@@ -79,26 +85,31 @@ def jalankan_tugas():
 
         time.sleep(5)  # Jeda 5 detik antar akun
 
-    # Hitung mundur 6 jam untuk tugas login
+# Fungsi utama untuk menjadwalkan tugas login dan kehadiran harian
+def jadwalkan_tugas():
     next_login_time = datetime.now() + timedelta(hours=6)
-    print(f"\nSemua akun telah diproses. Hitung mundur 6 jam hingga {next_login_time.strftime('%Y-%m-%d %H:%M:%S')}")
-    while datetime.now() < next_login_time:
-        remaining_time = next_login_time - datetime.now()
-        print(f"Hitung mundur: {remaining_time}", end='\r')
-        time.sleep(1)
-
-def jadwalkan_tugas_kehadiran():
-    # Menjadwalkan tugas kehadiran harian untuk dijalankan 24 jam setelah eksekusi terakhir
     next_attendance_time = datetime.now() + timedelta(hours=24)
-    print(f"\nJadwal tugas kehadiran harian berikutnya pada {next_attendance_time.strftime('%Y-%m-%d %H:%M:%S')}")
+
     while True:
-        if datetime.now() >= next_attendance_time:
-            jalankan_tugas()  # Jalankan tugas kehadiran harian
-            next_attendance_time = datetime.now() + timedelta(hours=24)  # Atur waktu berikutnya
-            print(f"\nJadwal tugas kehadiran harian berikutnya pada {next_attendance_time.strftime('%Y-%m-%d %H:%M:%S')}")
+        now = datetime.now()
+
+        # Jalankan tugas login jika waktu sudah tiba
+        if now >= next_login_time:
+            jalankan_tugas_login()  # Jalankan tugas login
+            next_login_time = now + timedelta(hours=6)  # Atur waktu berikutnya
+
+        # Jalankan tugas kehadiran harian jika waktu sudah tiba
+        if now >= next_attendance_time:
+            jalankan_tugas_kehadiran()  # Jalankan tugas kehadiran harian
+            next_attendance_time = now + timedelta(hours=24)  # Atur waktu berikutnya
+
+        # Hitung mundur dan periksa setiap menit
+        remaining_time_login = next_login_time - now
+        remaining_time_attendance = next_attendance_time - now
+        print(f"Hitung mundur login berikutnya: {remaining_time_login}", end='\r')
+        print(f"Hitung mundur kehadiran berikutnya: {remaining_time_attendance}", end='\r')
+
         time.sleep(60)  # Periksa setiap menit
 
 if __name__ == "__main__":
-    while True:
-        jalankan_tugas()  # Jalankan tugas login
-        jadwalkan_tugas_kehadiran()  # Jalankan tugas kehadiran harian sesuai jadwal
+    jadwalkan_tugas()  # Mulai jadwal tugas
