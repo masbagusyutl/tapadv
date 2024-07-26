@@ -87,13 +87,17 @@ def jadwalkan_tugas():
 
         # Jalankan tugas login jika waktu sudah tiba
         if now >= next_login_time:
+            print("Waktu untuk menjalankan tugas login telah tiba.")
             jalankan_semua_tugas()  # Jalankan semua tugas login dan kehadiran harian
             next_login_time = now + timedelta(hours=6)  # Atur waktu berikutnya
+            print(f"Tugas login berikutnya dijadwalkan pada {next_login_time.strftime('%Y-%m-%d %H:%M:%S')}")
 
         # Jalankan tugas kehadiran harian jika waktu sudah tiba
         if now >= next_attendance_time:
+            print("Waktu untuk menjalankan tugas kehadiran harian telah tiba.")
             jalankan_semua_tugas()  # Jalankan semua tugas login dan kehadiran harian
             next_attendance_time = now + timedelta(hours=24)  # Atur waktu berikutnya
+            print(f"Tugas kehadiran harian berikutnya dijadwalkan pada {next_attendance_time.strftime('%Y-%m-%d %H:%M:%S')}")
 
         # Hitung mundur dan periksa setiap menit
         remaining_time_login = next_login_time - now
@@ -104,5 +108,7 @@ def jadwalkan_tugas():
         time.sleep(60)  # Periksa setiap menit
 
 if __name__ == "__main__":
+    print("Menjalankan semua tugas untuk pertama kali...")
     jalankan_semua_tugas()  # Jalankan semua tugas login dan kehadiran harian sekali
+    print("Menjadwalkan tugas login dan kehadiran harian...")
     jadwalkan_tugas()  # Mulai jadwal tugas
